@@ -1,0 +1,567 @@
+---
+title: "Final Project Part 1"
+author: "Alexander Tran"
+date: "10/22/2021"
+output: html_document
+---
+
+```{r setup}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyr)
+library(dplyr)
+library(tidyverse)
+library(ggplot2)
+library(car)
+
+data <- read.csv("08_19_2020.csv", header = TRUE, sep = ";")
+```
+
+
+```{r}
+clean <- data
+
+clean <- clean %>% select(t1p1_goldat15, t1p2_goldat15, t1p3_goldat15, t1p4_goldat15, t1p5_goldat15, t2p1_goldat15, t2p2_goldat15, t2p3_goldat15, t2p4_goldat15, t2p5_goldat15, t1_firstblood, t1_firstdragon, t1_firstherald, t1_firsttower, t1p1_goldat10, t1p2_goldat10, t1p3_goldat10, t1p4_goldat10, t1p5_goldat10, t2p1_goldat10, t2p2_goldat10, t2p3_goldat10, t2p4_goldat10, t2p5_goldat10, t1p1_csat15, t1p2_csat15, t1p3_csat15, t1p4_csat15, t1p5_csat15, t2p1_csat15, t2p2_csat15, t2p3_csat15, t2p4_csat15, t2p5_csat15, t1p1_csat10, t1p2_csat10, t1p3_csat10, t1p4_csat10, t1p5_csat10, t2p1_csat10, t2p2_csat10, t2p3_csat10, t2p4_csat10, t2p5_csat10)
+
+clean[clean == "NULL"] <- NA
+clean <- clean %>% na.omit()
+```
+
+```{r}
+#Creating golddiffat15
+clean <- clean %>% mutate(team1goldat15 = as.numeric(t1p1_goldat15) + as.numeric(t1p2_goldat15) + as.numeric(t1p3_goldat15) + as.numeric(t1p4_goldat15) + as.numeric(t1p5_goldat15))
+
+clean <- clean %>% mutate(team2goldat15 = as.numeric(t2p1_goldat15) + as.numeric(t2p2_goldat15) + as.numeric(t2p3_goldat15) + as.numeric(t2p4_goldat15) + as.numeric(t2p5_goldat15))
+
+clean <- clean %>% mutate(golddiffat15 = team1goldat15 - team2goldat15)
+```
+
+```{r}
+#Creating golddiffat10 for each player
+clean <- clean %>% mutate(t1p1_goldat10 = as.numeric(t1p1_goldat10))
+clean <- clean %>% mutate(t1p2_goldat10 = as.numeric(t1p2_goldat10))
+clean <- clean %>% mutate(t1p3_goldat10 = as.numeric(t1p3_goldat10))
+clean <- clean %>% mutate(t1p4_goldat10 = as.numeric(t1p4_goldat10))
+clean <- clean %>% mutate(t1p5_goldat10 = as.numeric(t1p5_goldat10))
+
+clean <- clean %>% mutate(t2p1_goldat10 = as.numeric(t2p1_goldat10))
+clean <- clean %>% mutate(t2p2_goldat10 = as.numeric(t2p2_goldat10))
+clean <- clean %>% mutate(t2p3_goldat10 = as.numeric(t2p3_goldat10))
+clean <- clean %>% mutate(t2p4_goldat10 = as.numeric(t2p4_goldat10))
+clean <- clean %>% mutate(t2p5_goldat10 = as.numeric(t2p5_goldat10))
+
+clean <- clean %>% mutate(p12golddiffat10 = t1p1_goldat10 - t2p1_goldat10 + t1p2_goldat10 - t2p2_goldat10)
+clean <- clean %>% mutate(p3golddiffat10 = t1p3_goldat10 - t2p3_goldat10)
+clean <- clean %>% mutate(p4golddiffat10 = t1p4_goldat10 - t2p4_goldat10)
+clean <- clean %>% mutate(p5golddiffat10 = t1p5_goldat10 - t2p5_goldat10)
+```
+
+```{r}
+#Creating csdiffat15 for each player
+clean <- clean %>% mutate(t1p1_csat15 = as.numeric(t1p1_csat15))
+clean <- clean %>% mutate(t1p2_csat15 = as.numeric(t1p2_csat15))
+clean <- clean %>% mutate(t1p3_csat15 = as.numeric(t1p3_csat15))
+clean <- clean %>% mutate(t1p4_csat15 = as.numeric(t1p4_csat15))
+clean <- clean %>% mutate(t1p5_csat15 = as.numeric(t1p5_csat15))
+
+clean <- clean %>% mutate(t2p1_csat15 = as.numeric(t2p1_csat15))
+clean <- clean %>% mutate(t2p2_csat15 = as.numeric(t2p2_csat15))
+clean <- clean %>% mutate(t2p3_csat15 = as.numeric(t2p3_csat15))
+clean <- clean %>% mutate(t2p4_csat15 = as.numeric(t2p4_csat15))
+clean <- clean %>% mutate(t2p5_csat15 = as.numeric(t2p5_csat15))
+
+clean <- clean %>% mutate(p12csdiffat15 = t1p1_csat15 - t2p1_csat15 + t1p2_csat15 - t2p2_csat15)
+clean <- clean %>% mutate(p3csdiffat15 = t1p3_csat15 - t2p3_csat15)
+clean <- clean %>% mutate(p4csdiffat15 = t1p4_csat15 - t2p4_csat15)
+clean <- clean %>% mutate(p5csdiffat15 = t1p5_csat15 - t2p5_csat15)
+```
+
+```{r}
+#Creating csdiffat10 for each player
+clean <- clean %>% mutate(t1p1_csat10 = as.numeric(t1p1_csat10))
+clean <- clean %>% mutate(t1p2_csat10 = as.numeric(t1p2_csat10))
+clean <- clean %>% mutate(t1p3_csat10 = as.numeric(t1p3_csat10))
+clean <- clean %>% mutate(t1p4_csat10 = as.numeric(t1p4_csat10))
+clean <- clean %>% mutate(t1p5_csat10 = as.numeric(t1p5_csat10))
+
+clean <- clean %>% mutate(t2p1_csat10 = as.numeric(t2p1_csat10))
+clean <- clean %>% mutate(t2p2_csat10 = as.numeric(t2p2_csat10))
+clean <- clean %>% mutate(t2p3_csat10 = as.numeric(t2p3_csat10))
+clean <- clean %>% mutate(t2p4_csat10 = as.numeric(t2p4_csat10))
+clean <- clean %>% mutate(t2p5_csat10 = as.numeric(t2p5_csat10))
+
+clean <- clean %>% mutate(p12csdiffat10 = t1p1_csat10 - t2p1_csat10 + t1p2_csat10 - t2p2_csat10)
+clean <- clean %>% mutate(p3csdiffat10 = t1p3_csat10 - t2p3_csat10)
+clean <- clean %>% mutate(p4csdiffat10 = t1p4_csat10 - t2p4_csat10)
+clean <- clean %>% mutate(p5csdiffat10 = t1p5_csat10 - t2p5_csat10)
+```
+
+```{r}
+#Changing variables from chr to int
+clean <- clean %>% mutate(firstblood = ifelse(t1_firstblood == "1", 1, 0))
+clean <- clean %>% mutate(firstdragon = ifelse(t1_firstdragon == "1", 1, 0))
+clean <- clean %>% mutate(firstherald = ifelse(t1_firstherald == "1", 1, 0))
+clean <- clean %>% mutate(firsttower = ifelse(t1_firsttower == "1", 1, 0))
+```
+
+```{r}
+#Isolating our variables of interest
+selectedcolumns <- clean %>% select(golddiffat15, firstblood, firstdragon, firstherald, firsttower, p12golddiffat10, p3golddiffat10, p4golddiffat10, p5golddiffat10, p12csdiffat15, p3csdiffat15, p4csdiffat15, p5csdiffat15, p12csdiffat10, p3csdiffat10, p4csdiffat10, p5csdiffat10)
+
+selectedcolumns <- selectedcolumns %>% na.omit()
+
+#Splitting into training and test sets
+set.seed(1006314089)
+
+sample <- sample.int(n = nrow(selectedcolumns), size = floor(.75*nrow(selectedcolumns)), replace = F)
+train <- selectedcolumns[sample, ]
+test  <- selectedcolumns[-sample, ]
+```
+
+```{r setup, include=TRUE, echo=TRUE}
+#Summarising Data
+summary(train)
+var(train$golddiffat15)
+var(train$firstblood)
+var(train$firstdragon)
+var(train$firstherald)
+var(train$firsttower)
+var(train$p12golddiffat10)
+var(train$p3golddiffat10)
+var(train$p4golddiffat10)
+var(train$p5golddiffat10)
+var(train$p12csdiffat15)
+var(train$p3csdiffat15)
+var(train$p4csdiffat15)
+var(train$p5csdiffat15)
+var(train$p12csdiffat10)
+var(train$p3csdiffat10)
+var(train$p4csdiffat10)
+var(train$p5csdiffat10)
+```
+
+
+```{r}
+#Histograms
+train %>% ggplot(aes(x=golddiffat15)) + geom_histogram(binwidth = 250, color="black", fill="white") + labs(title="golddiffat15",x="golddiffat15", y = "Frequency")
+
+train %>% ggplot(aes(x=p12golddiffat10)) + geom_histogram(binwidth = 250, color="black", fill="white") + labs(title="p12golddiffat10 Histogram Plot",x="p12golddiffat10", y = "Frequency")
+train %>% ggplot(aes(x=p3golddiffat10)) + geom_histogram(binwidth = 250, color="black", fill="white") + labs(title="p3golddiffat10",x="p3golddiffat10", y = "Frequency")
+train %>% ggplot(aes(x=p4golddiffat10)) + geom_histogram(binwidth = 250, color="black", fill="white") + labs(title="p4golddiffat10",x="p4golddiffat10", y = "Frequency")
+train %>% ggplot(aes(x=p5golddiffat10)) + geom_histogram(binwidth = 250, color="black", fill="white") + labs(title="p5golddiffat10",x="p5golddiffat10", y = "Frequency")
+
+train %>% ggplot(aes(x=p12csdiffat15)) + geom_histogram(binwidth = 5, color="black", fill="white") + labs(title="p12csdiffat15 Histogram Plot",x="p12csdiffat15", y = "Frequency")
+train %>% ggplot(aes(x=p3csdiffat15)) + geom_histogram(binwidth = 5, color="black", fill="white") + labs(title="p3csdiffat15 Histogram Plot",x="p3csdiffat15", y = "Frequency")
+train %>% ggplot(aes(x=p4csdiffat15)) + geom_histogram(binwidth = 5, color="black", fill="white") + labs(title="p4csdiffat15 Histogram Plot",x="p4csdiffat15", y = "Frequency")
+train %>% ggplot(aes(x=p5csdiffat15)) + geom_histogram(binwidth = 5, color="black", fill="white") + labs(title="p5csdiffat15 Histogram Plot",x="p5csdiffat15", y = "Frequency")
+
+train %>% ggplot(aes(x=p12csdiffat10)) + geom_histogram(binwidth = 5, color="black", fill="white") + labs(title="p12csdiffat10 Histogram Plot",x="p12csdiffat10", y = "Frequency")
+train %>% ggplot(aes(x=p3csdiffat10)) + geom_histogram(binwidth = 5, color="black", fill="white") + labs(title="p3csdiffat10 Histogram Plot",x="p3csdiffat10", y = "Frequency")
+train %>% ggplot(aes(x=p4csdiffat10)) + geom_histogram(binwidth = 5, color="black", fill="white") + labs(title="p4csdiffat10 Histogram Plot",x="p4csdiffat10", y = "Frequency")
+train %>% ggplot(aes(x=p5csdiffat10)) + geom_histogram(binwidth = 5, color="black", fill="white") + labs(title="p5csdiffat10 Histogram Plot",x="p5csdiffat10", y = "Frequency")
+```
+
+```{r}
+train %>% ggplot(aes(x=golddiffat15)) + geom_histogram(binwidth = 250, color="#9e9e00", fill="#ffff00", alpha=0.5) + labs(title="Gold Difference at 15 Minutes Histogram Plot",x="Gold Difference at 15 Minutes", y = "Frequency") + geom_vline(aes(xintercept=mean(golddiffat15)), color="blue", linetype="dashed", size=1, alpha=0.5) + geom_vline(aes(xintercept=median(golddiffat15)), color="red", linetype="dashed", size=1, alpha=0.5)
+
+
+```
+
+```{r}
+#Scatterplots
+plot(train$golddiffat15 ~ train$p12golddiffat10, main = "GoldDiffAt15 vs p12golddiffat10", 
+     xlab = "p12golddiffat10", ylab = "GoldDiffAt15 Response Values")
+plot(train$golddiffat15 ~ train$p3golddiffat10, main = "GDat15 vs Player3 GDat10 Scatterplot", 
+     xlab = "Player3 GDat10", ylab = "GDat15 Response Values")
+plot(train$golddiffat15 ~ train$p4golddiffat10, main = "GoldDiffAt15 vs p4golddiffat10", 
+     xlab = "p4golddiffat10", ylab = "GoldDiffAt15 Response Values")
+plot(train$golddiffat15 ~ train$p5golddiffat10, main = "GoldDiffAt15 vs p5golddiffat10", 
+     xlab = "p5golddiffat10", ylab = "GoldDiffAt15 Response Values")
+
+plot(train$golddiffat15 ~ train$p12csdiffat15, main = "GoldDiffAt15 vs p12csdiffat15", 
+     xlab = "p12csdiffat15", ylab = "GoldDiffAt15 Response Values")
+plot(train$golddiffat15 ~ train$p3csdiffat15, main = "GoldDiffAt15 vs p3csdiffat15", 
+     xlab = "p3csdiffat15", ylab = "GoldDiffAt15 Response Values")
+plot(train$golddiffat15 ~ train$p4csdiffat15, main = "GoldDiffAt15 vs p4csdiffat15", 
+     xlab = "p4csdiffat15", ylab = "GoldDiffAt15 Response Values")
+plot(train$golddiffat15 ~ train$p5csdiffat15, main = "GoldDiffAt15 vs p5csdiffat15", 
+     xlab = "p5csdiffat15", ylab = "GoldDiffAt15 Response Values")
+
+plot(train$golddiffat15 ~ train$p12csdiffat10, main = "GoldDiffAt15 vs p12csdiffat10", 
+     xlab = "p12csdiffat10", ylab = "GoldDiffAt15 Response Values")
+plot(train$golddiffat15 ~ train$p3csdiffat10, main = "GoldDiffAt15 vs p3csdiffat10", 
+     xlab = "p3csdiffat10", ylab = "GoldDiffAt15 Response Values")
+plot(train$golddiffat15 ~ train$p4csdiffat10, main = "GoldDiffAt15 vs p4csdiffat10", 
+     xlab = "p4csdiffat10", ylab = "GoldDiffAt15 Response Values")
+plot(train$golddiffat15 ~ train$p5csdiffat10, main = "GoldDiffAt15 vs p5csdiffat10", 
+     xlab = "p5csdiffat10", ylab = "GoldDiffAt15 Response Values")
+```
+
+
+```{r}
+#Boxplots
+train %>% ggplot(aes(x=firstblood, y=golddiffat15, group=firstblood)) + geom_boxplot(color="black", fill="white") + labs(title="GDat15 vs FirstBlood BoxPlot", x = "FirstBlood", y = "GDat15") + scale_fill_manual(values=c("#E97574", "#F71210"))
+train %>% ggplot(aes(x=firstdragon, y=golddiffat15, group=firstdragon)) + geom_boxplot(color="black", fill="white") + labs(title="golddiffat15 vs firstdragon BoxPlot")
+train %>% ggplot(aes(x=firstherald, y=golddiffat15, group=firstherald)) + geom_boxplot(color="black", fill="white") + labs(title="golddiffat15 vs firstherald BoxPlot")
+train %>% ggplot(aes(x=firsttower, y=golddiffat15, group=firsttower)) + geom_boxplot(color="black", fill="white") + labs(title="golddiffat15 vs firsttower BoxPlot")
+```
+
+```{r}
+#Creating an initial model with all predictors that made sense
+model <- lm(formula = golddiffat15 ~ firstblood + firstdragon + firstherald + firsttower + p12golddiffat10 + p3golddiffat10 + p4golddiffat10 + p5golddiffat10 + p12csdiffat15 + p3csdiffat15 + p4csdiffat15 + p5csdiffat15 + p12csdiffat10 + p3csdiffat10 + p4csdiffat10 + p5csdiffat10, data = train)
+summary(model)
+```
+
+```{r}
+plot(train$golddiffat15 ~ fitted(model), main = "GoldDiffAt15 vs Fitted values", 
+     xlab = "Fitted Values", ylab = "GoldDiffAt15 Response Values")
+abline(a=0,b=1)
+lines(lowess(train$golddiffat15~fitted(model)), lty=2)
+```
+```{r}
+pairs(~ p12golddiffat10 + p3golddiffat10 + p4golddiffat10 + p5golddiffat10 + p12csdiffat15 + p3csdiffat15 + p4csdiffat15 + p5csdiffat15 + p12csdiffat10 + p3csdiffat10 + p4csdiffat10 + p5csdiffat10, data = train)
+
+pairs(~ p3golddiffat10 + p4golddiffat10 + p3csdiffat15 + p4csdiffat15 + p3csdiffat10 + p4csdiffat10, data = train)
+```
+```{r}
+pairs(~ firstblood + firstdragon + firstherald + firsttower + p12golddiffat10 + p3golddiffat10 + p4golddiffat10 + p5golddiffat10 + p12csdiffat15 + p3csdiffat15 + p4csdiffat15 + p5csdiffat15 + p12csdiffat10 + p3csdiffat10 + p4csdiffat10 + p5csdiffat10, data = train)
+```
+```{r}
+#After checking conditions, the following changes were made to exclude the predictors mentioned below
+#All csdiffat15 variables were removed due to obvious multicollinearity issues with csdiffat10
+model2 <- lm(formula = golddiffat15 ~ firstblood + firstdragon + firstherald + firsttower + p12golddiffat10 + p3golddiffat10 + p4golddiffat10 + p5golddiffat10 + p12csdiffat10 + p3csdiffat10 + p4csdiffat10 + p5csdiffat10, data = train)
+summary(model2)
+
+plot(train$golddiffat15 ~ fitted(model2), main = "GoldDiffAt15 vs Fitted values", 
+     xlab = "Fitted Values", ylab = "GoldDiffAt15 Response Values")
+abline(a=0,b=1)
+lines(lowess(train$golddiffat15~fitted(model2)), lty=2)
+
+pairs (~ firstblood + firstdragon + firstherald + firsttower + p12golddiffat10 + p3golddiffat10 + p4golddiffat10 + p5golddiffat10 + p12csdiffat10 + p3csdiffat10 + p4csdiffat10 + p5csdiffat10, data = train)
+```
+
+```{r}
+#Creating residual plots
+residuals <- rstandard(model2)
+plot(residuals ~ fitted(model2), main = "Fitted Values vs Residuals", xlab = "Fitted Values", ylab = "Residuals")
+
+
+plot(residuals ~ train$firstblood, main = "Residuals vs firstblood", 
+     xlab = "firstblood", ylab = "Residuals")
+plot(residuals ~ train$firstdragon, main = "Residuals vs firstdragon", 
+     xlab = "firstdragon", ylab = "Residuals")
+plot(residuals ~ train$firstherald, main = "Residuals vs firstherald", 
+     xlab = "firstherald", ylab = "Residuals")
+plot(residuals ~ train$firsttower, main = "Residuals vs firsttower", 
+     xlab = "firsttower", ylab = "Residuals")
+
+plot(residuals ~ train$p12golddiffat10, main = "Residuals vs p12golddiffat10", 
+     xlab = "p12golddiffat10", ylab = "Residuals")
+plot(residuals ~ train$p3golddiffat10, main = "Residuals vs p3golddiffat10", 
+     xlab = "p3golddiffat10", ylab = "Residuals")
+plot(residuals ~ train$p4golddiffat10, main = "Residuals vs p4golddiffat10", 
+     xlab = "p4golddiffat10", ylab = "Residuals")
+plot(residuals ~ train$p5golddiffat10, main = "Residuals vs p5golddiffat10", 
+     xlab = "p5golddiffat10", ylab = "Residuals")
+
+plot(residuals ~ train$p12csdiffat10, main = "Residuals vs p12csdiffat10", 
+     xlab = "p12csdiffat10", ylab = "Residualss")
+plot(residuals ~ train$p3csdiffat10, main = "Residuals vs p3csdiffat10", 
+     xlab = "p3csdiffat10", ylab = "Residuals")
+plot(residuals ~ train$p4csdiffat10, main = "Residuals vs p4csdiffat10", 
+     xlab = "p4csdiffat10", ylab = "Residuals")
+plot(residuals ~ train$p5csdiffat10, main = "Residuals vs p5csdiffat10", 
+     xlab = "p5csdiffat10", ylab = "Residuals")
+
+qqnorm(residuals)
+qqline(residuals)
+```
+
+```{r}
+#No transformations were done because boxCox transformations require mostly non-negative values, which simply isn't the case here
+
+#Let's introduce some other models to see how they fare in terms of multicollinearity
+model101 <- lm(formula = golddiffat15 ~ firstblood + firstdragon + firstherald + firsttower + p12golddiffat10 + p3golddiffat10 + p4golddiffat10 + p5golddiffat10, data = train)
+
+model102 <- lm(formula = golddiffat15 ~ firstblood + firstdragon + firstherald + firsttower + p12csdiffat15 + p3csdiffat15 + p4csdiffat15 + p5csdiffat15, data = train)
+
+model103 <- lm(formula = golddiffat15 ~ firstblood + firstdragon + firstherald + firsttower + p12csdiffat10 + p3csdiffat10 + p4csdiffat10 + p5csdiffat10, data = train)
+
+model104 <- lm(formula = golddiffat15 ~ firstblood + firstdragon + firstherald + firsttower + p12golddiffat10 + p3golddiffat10 + p4golddiffat10 + p5golddiffat10 + p12csdiffat15 + p3csdiffat15 + p4csdiffat15 + p5csdiffat15, data = train)
+
+model105 <- lm(formula = golddiffat15 ~ firstblood + firstdragon + firstherald + firsttower +  p12csdiffat15 + p3csdiffat15 + p4csdiffat15 + p5csdiffat15 + p12csdiffat10 + p3csdiffat10 + p4csdiffat10 + p5csdiffat10, data = train)
+
+model106 <- lm(formula = golddiffat15 ~ p12golddiffat10 + p3golddiffat10 + p4golddiffat10 + p5golddiffat10 + p12csdiffat15 + p3csdiffat15 + p4csdiffat15 + p5csdiffat15, data = train)
+
+model107 <- lm(formula = golddiffat15 ~ p12csdiffat15 + p3csdiffat15 + p4csdiffat15 + p5csdiffat15 + p12csdiffat10 + p3csdiffat10 + p4csdiffat10 + p5csdiffat10, data = train)
+
+model108 <- lm(formula = golddiffat15 ~ p12golddiffat10 + p3golddiffat10 + p4golddiffat10 + p5golddiffat10 + p12csdiffat15 + p3csdiffat15 + p4csdiffat15 + p5csdiffat15 + p12csdiffat10 + p3csdiffat10 + p4csdiffat10 + p5csdiffat10, data = train)
+
+model109 <- lm(formula = golddiffat15 ~ firstblood + firstherald + firsttower + p12golddiffat10 + p3golddiffat10 + p4golddiffat10 + p5golddiffat10 + p12csdiffat15 + p3csdiffat15 + p4csdiffat15 + p5csdiffat15, data = train)
+
+#Checking Multicollinearity
+vif(model)
+vif(model2)
+```
+
+```{r}
+vif(model101)
+vif(model102)
+vif(model103)
+vif(model104)
+vif(model105)
+vif(model106)
+vif(model107)
+vif(model108)
+vif(model109)
+
+#These are acceptable levels of multicollinearity and so we will keep all of our current predictors in model2
+```
+```{r}
+#Checking adjusted R^2s
+preds <- c(length(coef(model))-1, length(coef(model2))-1, length(coef(model101))-1, length(coef(model102))-1, length(coef(model103))-1, length(coef(model104))-1, length(coef(model105))-1, length(coef(model106))-1, length(coef(model107))-1, length(coef(model108))-1, length(coef(model109))-1)
+
+rsq <- c(summary(model)$adj.r.squared, summary(model2)$adj.r.squared, summary(model101)$adj.r.squared, summary(model102)$adj.r.squared, summary(model103)$adj.r.squared, summary(model104)$adj.r.squared, summary(model105)$adj.r.squared, summary(model106)$adj.r.squared, summary(model107)$adj.r.squared, summary(model108)$adj.r.squared, summary(model109)$adj.r.squared)
+
+cbind(preds, rsq)
+```
+```{r}
+#AIC, BIC
+aic <- c(AIC(model), AIC(model2), AIC(model101), AIC(model102), AIC(model103), AIC(model104), AIC(model105), AIC(model106), AIC(model107), AIC(model108), AIC(model109))
+cbind(preds, aic)
+
+bic <- c(BIC(model), BIC(model2), BIC(model101), BIC(model102), BIC(model103), BIC(model104), BIC(model105), BIC(model106), BIC(model107), BIC(model108), AIC(model109))
+cbind(preds, bic)
+```
+```{r}
+#Anova Tables
+anova(model2)
+anova(model104)
+anova(model109)
+anova(model109, model2)
+anova(model109, model104)
+```
+
+```{r}
+#Based on what we've seen, model2, model104, and model109 seem to be much preferred than the other models, with model 109 taking the lead. We will proceed using model 109.
+summary(model109)
+#Rechecking assumptions with model104
+plot(train$golddiffat15 ~ fitted(model109), main = "GoldDiffAt15 vs Fitted values", 
+     xlab = "Fitted Values", ylab = "GoldDiffAt15 Response Values")
+abline(a=0,b=1)
+lines(lowess(train$golddiffat15~fitted(model109)), lty=2)
+
+pairs (~ firstblood + firstherald + firsttower + p12golddiffat10 + p3golddiffat10 + p4golddiffat10 + p5golddiffat10 + p12csdiffat15 + p3csdiffat15 + p4csdiffat15 + p5csdiffat15, data = train)
+
+#Creating residual plots
+residuals <- rstandard(model109)
+plot(residuals ~ fitted(model109), main = "Fitted Values vs Residuals", xlab = "Fitted Values", ylab = "Residuals")
+
+
+plot(residuals ~ train$firstblood, main = "Residuals vs firstblood", 
+     xlab = "firstblood", ylab = "Residuals")
+plot(residuals ~ train$firstherald, main = "Residuals vs firstherald", 
+     xlab = "firstherald", ylab = "Residuals")
+plot(residuals ~ train$firsttower, main = "Residuals vs firsttower", 
+     xlab = "firsttower", ylab = "Residuals")
+
+plot(residuals ~ train$p12golddiffat10, main = "Residuals vs p12golddiffat10", 
+     xlab = "p12golddiffat10", ylab = "Residuals")
+plot(residuals ~ train$p3golddiffat10, main = "Residuals vs p3golddiffat10", 
+     xlab = "p3golddiffat10", ylab = "Residuals")
+plot(residuals ~ train$p4golddiffat10, main = "Residuals vs p4golddiffat10", 
+     xlab = "p4golddiffat10", ylab = "Residuals")
+plot(residuals ~ train$p5golddiffat10, main = "Residuals vs p5golddiffat10", 
+     xlab = "p5golddiffat10", ylab = "Residuals")
+
+plot(residuals ~ train$p12csdiffat10, main = "Residuals vs p12csdiffat10", 
+     xlab = "p12csdiffat10", ylab = "Residualss")
+plot(residuals ~ train$p3csdiffat10, main = "Residuals vs p3csdiffat10", 
+     xlab = "p3csdiffat10", ylab = "Residuals")
+plot(residuals ~ train$p4csdiffat10, main = "Residuals vs p4csdiffat10", 
+     xlab = "p4csdiffat10", ylab = "Residuals")
+plot(residuals ~ train$p5csdiffat10, main = "Residuals vs p5csdiffat10", 
+     xlab = "p5csdiffat10", ylab = "Residuals")
+
+qqnorm(residuals)
+qqline(residuals)
+```
+
+```{r}
+#Identifying leverage points, outliers, and influential observations
+
+# information from the model
+n <- length(train$golddiffat15)
+p <- length(coef(model109))-1
+# calculate the leverage values and compare to cutoff
+h <- hatvalues(model109)
+hcut <- 2*(p+1)/n
+# which observations are leverage points?
+w1 <- which(h > hcut)
+
+# which observations are outliers?
+w2 <- which(residuals < -4 | residuals > 4)
+
+w3 <- which(residuals < -2 | residuals > 2)
+
+# find the cooks distance and compare to cutoff
+Dcutoff <- qf(0.5, p+1, n-p-1)
+D <- cooks.distance(model109)
+which(D > Dcutoff)
+
+# find the DFFITS and compare to cutoff
+DFFITScut <- 2*sqrt((p+1)/n)
+dfs <- dffits(model109)
+w4 <- which(abs(dfs) > DFFITScut)
+
+# find the DFBETAS and compare to cutoff
+DFBETAcut <- 2/sqrt(n)
+dfb <- dfbetas(model109)
+w5 <- which(abs(dfb[,1]) > DFBETAcut)
+
+DFBETAcut <- 2/sqrt(n)
+dfb <- dfbetas(model109)
+w6 <- which(abs(dfb[,2]) > DFBETAcut)
+
+DFBETAcut <- 2/sqrt(n)
+dfb <- dfbetas(model109)
+w7 <- which(abs(dfb[,3]) > DFBETAcut)
+
+DFBETAcut <- 2/sqrt(n)
+dfb <- dfbetas(model109)
+w8 <- which(abs(dfb[,4]) > DFBETAcut)
+
+DFBETAcut <- 2/sqrt(n)
+dfb <- dfbetas(model109)
+w9 <- which(abs(dfb[,5]) > DFBETAcut)
+
+DFBETAcut <- 2/sqrt(n)
+dfb <- dfbetas(model109)
+w10 <- which(abs(dfb[,6]) > DFBETAcut)
+
+DFBETAcut <- 2/sqrt(n)
+dfb <- dfbetas(model109)
+w11 <- which(abs(dfb[,7]) > DFBETAcut)
+
+DFBETAcut <- 2/sqrt(n)
+dfb <- dfbetas(model109)
+w12 <- which(abs(dfb[,8]) > DFBETAcut)
+
+DFBETAcut <- 2/sqrt(n)
+dfb <- dfbetas(model109)
+w13 <- which(abs(dfb[,9]) > DFBETAcut)
+
+DFBETAcut <- 2/sqrt(n)
+dfb <- dfbetas(model109)
+w14 <- which(abs(dfb[,10]) > DFBETAcut)
+
+DFBETAcut <- 2/sqrt(n)
+dfb <- dfbetas(model109)
+w15 <- which(abs(dfb[,11]) > DFBETAcut)
+
+DFBETAcut <- 2/sqrt(n)
+dfb <- dfbetas(model109)
+w16 <- which(abs(dfb[,12]) > DFBETAcut)
+
+w <- unique(c(w4, w5, w6, w7, w8, w9, w10, w11, w12, w13, w14, w15, w16))
+
+plot(train[,1]~train[,6], main="golddiffat15 vs p12golddiffat10", xlab="p12golddiffat10", ylab="golddiffat15")
+points(train[w,1]~train[w,6], col="orange", pch=19)
+points(train[w3,1]~train[w3,6], col="green", pch=19)
+points(train[w1,1]~train[w1,6], col="red", pch=19)
+points(train[w2,1]~train[w2,6], col="blue", pch=19)
+
+
+plot(train[,1]~train[,7], main="GDat15 vs Player3 GDat10", xlab="Player3 GDat10", ylab="GDat15")
+points(train[w,1]~train[w,7], col="orange", pch=19)
+points(train[w3,1]~train[w3,7], col="green", pch=19)
+points(train[w1,1]~train[w1,7], col="red", pch=19)
+points(train[w2,1]~train[w2,7], col="blue", pch=19)
+
+plot(train[,1]~train[,8], main="golddiffat15 vs p4golddiffat10", xlab="p4golddiffat10", ylab="golddiffat15")
+points(train[w,1]~train[w,8], col="orange", pch=19)
+points(train[w3,1]~train[w3,8], col="green", pch=19)
+points(train[w1,1]~train[w1,8], col="red", pch=19)
+points(train[w2,1]~train[w2,8], col="blue", pch=19)
+
+plot(train[,1]~train[,9], main="golddiffat15 vs p5golddiffat10", xlab="p5golddiffat10", ylab="golddiffat15")
+points(train[w,1]~train[w,9], col="orange", pch=19)
+points(train[w3,1]~train[w3,9], col="green", pch=19)
+points(train[w1,1]~train[w1,9], col="red", pch=19)
+points(train[w2,1]~train[w2,9], col="blue", pch=19)
+
+plot(train[,1]~train[,10], main="golddiffat15 vs p12csdiffat15", xlab="p12csdiffat15", ylab="golddiffat15")
+points(train[w,1]~train[w,10], col="orange", pch=19)
+points(train[w3,1]~train[w3,10], col="green", pch=19)
+points(train[w1,1]~train[w1,10], col="red", pch=19)
+points(train[w2,1]~train[w2,10], col="blue", pch=19)
+
+plot(train[,1]~train[,11], main="golddiffat15 vs p3csdiffat15", xlab="p3csdiffat15", ylab="golddiffat15")
+points(train[w,1]~train[w,11], col="orange", pch=19)
+points(train[w3,1]~train[w3,11], col="green", pch=19)
+points(train[w1,1]~train[w1,11], col="red", pch=19)
+points(train[w2,1]~train[w2,11], col="blue", pch=19)
+
+plot(train[,1]~train[,12], main="golddiffat15 vs p4csdiffat15", xlab="p4csdiffat15", ylab="golddiffat15")
+points(train[w,1]~train[w,12], col="orange", pch=19)
+points(train[w3,1]~train[w3,12], col="green", pch=19)
+points(train[w1,1]~train[w1,12], col="red", pch=19)
+points(train[w2,1]~train[w2,12], col="blue", pch=19)
+
+plot(train[,1]~train[,13], main="golddiffat15 vs p5csdiffat15", xlab="p5csdiffat15", ylab="golddiffat15")
+points(train[w,1]~train[w,13], col="orange", pch=19)
+points(train[w3,1]~train[w3,13], col="green", pch=19)
+points(train[w1,1]~train[w1,13], col="red", pch=19)
+points(train[w2,1]~train[w2,13], col="blue", pch=19)
+```
+
+
+```{r}
+confint(model109, level=0.95)
+```
+
+```{r}
+#Validating model on test data
+testmodel <- lm(formula = golddiffat15 ~ firstblood + firstherald + firsttower + p12golddiffat10 + p3golddiffat10 + p4golddiffat10 + p5golddiffat10 + p12csdiffat15 + p3csdiffat15 + p4csdiffat15 + p5csdiffat15, data = test)
+summary(testmodel)
+#Rechecking assumptions with model104
+plot(test$golddiffat15 ~ fitted(testmodel), main = "GoldDiffAt15 vs Fitted values", 
+     xlab = "Fitted Values", ylab = "GoldDiffAt15 Response Values")
+abline(a=0,b=1)
+lines(lowess(test$golddiffat15~fitted(testmodel)), lty=2)
+
+pairs (~ firstblood + firstherald + firsttower + p12golddiffat10 + p3golddiffat10 + p4golddiffat10 + p5golddiffat10 + p12csdiffat15 + p3csdiffat15 + p4csdiffat15 + p5csdiffat15, data = test)
+
+#Creating residual plots
+residuals <- rstandard(testmodel)
+plot(residuals ~ fitted(testmodel), main = "Fitted Values vs Residuals", xlab = "Fitted Values", ylab = "Residuals")
+
+
+plot(residuals ~ test$firstblood, main = "Residuals vs firstblood", 
+     xlab = "firstblood", ylab = "Residuals")
+plot(residuals ~ test$firstherald, main = "Residuals vs firstherald", 
+     xlab = "firstherald", ylab = "Residuals")
+plot(residuals ~ test$firsttower, main = "Residuals vs firsttower", 
+     xlab = "firsttower", ylab = "Residuals")
+
+plot(residuals ~ test$p12golddiffat10, main = "Residuals vs p12golddiffat10", 
+     xlab = "p12golddiffat10", ylab = "Residuals")
+plot(residuals ~ test$p3golddiffat10, main = "Residuals vs p3golddiffat10", 
+     xlab = "p3golddiffat10", ylab = "Residuals")
+plot(residuals ~ test$p4golddiffat10, main = "Residuals vs p4golddiffat10", 
+     xlab = "p4golddiffat10", ylab = "Residuals")
+plot(residuals ~ test$p5golddiffat10, main = "Residuals vs p5golddiffat10", 
+     xlab = "p5golddiffat10", ylab = "Residuals")
+
+plot(residuals ~ test$p12csdiffat10, main = "Residuals vs p12csdiffat10", 
+     xlab = "p12csdiffat10", ylab = "Residualss")
+plot(residuals ~ test$p3csdiffat10, main = "Residuals vs p3csdiffat10", 
+     xlab = "p3csdiffat10", ylab = "Residuals")
+plot(residuals ~ test$p4csdiffat10, main = "Residuals vs p4csdiffat10", 
+     xlab = "p4csdiffat10", ylab = "Residuals")
+plot(residuals ~ test$p5csdiffat10, main = "Residuals vs p5csdiffat10", 
+     xlab = "p5csdiffat10", ylab = "Residuals")
+
+qqnorm(residuals)
+qqline(residuals)
+```
+MODEL LOOKS GOOD ON TEST DATA!
